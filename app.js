@@ -28,11 +28,109 @@ links?.querySelectorAll("a").forEach((link) => {
 
 const form = document.getElementById("lead-form");
 const note = document.getElementById("form-note");
+const QUOTE_MAIL = window.ENJAMARINE_MAIL?.toEmail?.trim() || "contacto@enjamarine.com";
+const QUOTE_ENDPOINT = "https://api.web3forms.com/submit";
+if (window.emailjs && window.ENJAMARINE_MAIL?.emailjs?.publicKey) {
+  window.emailjs.init({ publicKey: window.ENJAMARINE_MAIL.emailjs.publicKey });
+}
 
-form?.addEventListener("submit", (event) => {
+form?.addEventListener("submit", async (event) => {
   event.preventDefault();
-  note.hidden = false;
-  form.reset();
+  const button = form.querySelector("button[type=submit]");
+  const honey = form.querySelector("[name=_honey]");
+  if (honey?.value) return;
+
+  const mailCfg = window.ENJAMARINE_MAIL || {};
+  const accessKey = mailCfg.accessKey?.trim();
+  const emailjsCfg = mailCfg.emailjs || {};
+  const publicKey = emailjsCfg.publicKey?.trim();
+  const serviceId = emailjsCfg.serviceId?.trim();
+  const templateId = emailjsCfg.templateId?.trim();
+  const useEmailJs = Boolean(window.emailjs && publicKey && serviceId && templateId);
+  note.hidden = true;
+  note.classList.remove("is-error");
+
+  if (!useEmailJs && !accessKey) {
+    note.textContent = "Falta configurar el envío. Completa EmailJS en mail-config.js.";
+    note.classList.add("is-error");
+    note.hidden = false;
+    return;
+  }
+
+  form.classList.add("is-sending");
+  button.disabled = true;
+  form.querySelectorAll("input, select, textarea").forEach((field) => {
+    if (field.name !== "_honey") field.disabled = true;
+  });
+
+  const nombre = form.nombre.value.trim();
+  const empresa = form.empresa.value.trim();
+  const email = form.email.value.trim();
+  const interes = form.interes.value.trim();
+  const detalle = form.mensaje.value.trim() || "Sin detalle adicional.";
+  const subject = `Nueva solicitud de cotización · ${empresa} · ENJAMARINE.CL`;
+
+  try {
+    let ok = false;
+    if (useEmailJs) {
+      const sent = await window.emailjs.send(
+        serviceId,
+        templateId,
+        {
+          to_email: QUOTE_MAIL,
+          subject,
+          title: subject,
+          nombre,
+          name: nombre,
+          empresa,
+          correo: email,
+          email,
+          servicio: interes,
+          detalle,
+        },
+        { publicKey },
+      );
+      ok = sent.status === 200;
+    } else {
+      const response = await fetch(QUOTE_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          access_key: accessKey,
+          from_name: "ENJAMARINE.CL",
+          subject,
+          replyto: email,
+          nombre,
+          empresa,
+          correo: email,
+          servicio: interes,
+          detalle,
+          botcheck: "",
+        }),
+      });
+      const result = await response.json().catch(() => ({}));
+      ok = response.ok && result.success === true;
+    }
+    if (!ok) throw new Error("send-failed");
+    note.textContent = "Recibido. Te contactamos a la brevedad.";
+    note.hidden = false;
+    form.reset();
+  } catch (err) {
+    const detail = err?.text || err?.message || "";
+    note.textContent = `No se pudo enviar. Escríbenos a ${QUOTE_MAIL}`;
+    if (detail) note.textContent += ` (${detail})`;
+    note.classList.add("is-error");
+    note.hidden = false;
+  } finally {
+    form.classList.remove("is-sending");
+    button.disabled = false;
+    form.querySelectorAll("input, select, textarea").forEach((field) => {
+      field.disabled = false;
+    });
+  }
 });
 
 const shots = document.querySelectorAll(".shot");
@@ -78,12 +176,65 @@ if (window.gsap && window.ScrollTrigger && !reduceMotion) {
     ease: "power3.out",
   });
 
-  gsap.from(".about", {
+  const aboutTiles = gsap.utils.toArray(".about-tile");
+  gsap.from(aboutTiles, {
     scrollTrigger: { trigger: ".about", start: "top 82%" },
-    y: 24,
+    y: 36,
     opacity: 0,
-    duration: 0.7,
+    duration: 0.8,
+    stagger: 0.12,
+    ease: "power3.out",
+  });
+  gsap.from(".about-copy p", {
+    scrollTrigger: { trigger: ".about-copy", start: "top 88%" },
+    y: 16,
+    opacity: 0,
+    duration: 0.6,
+    stagger: 0.12,
     ease: "power2.out",
+  });
+  gsap.to(".about-quote-line", {
+    scrollTrigger: { trigger: ".about-quote", start: "top 90%" },
+    scaleX: 1,
+    duration: 1.1,
+    ease: "power2.out",
+  });
+
+  const finePointer = window.matchMedia("(pointer: fine)").matches;
+  aboutTiles.forEach((tile) => {
+    const glow = tile.querySelector(".about-glow");
+    if (!finePointer) return;
+    tile.addEventListener("pointermove", (event) => {
+      const box = tile.getBoundingClientRect();
+      const x = event.clientX - box.left;
+      const y = event.clientY - box.top;
+      if (glow) {
+        glow.style.left = `${x}px`;
+        glow.style.top = `${y}px`;
+      }
+      const rx = ((y / box.height) - 0.5) * -7;
+      const ry = ((x / box.width) - 0.5) * 9;
+      gsap.to(tile, {
+        rotateX: rx,
+        rotateY: ry,
+        y: -6,
+        duration: 0.35,
+        ease: "power2.out",
+        overwrite: "auto",
+      });
+      tile.classList.add("is-hot");
+    });
+    tile.addEventListener("pointerleave", () => {
+      gsap.to(tile, {
+        rotateX: 0,
+        rotateY: 0,
+        y: 0,
+        duration: 0.5,
+        ease: "power3.out",
+        overwrite: "auto",
+      });
+      tile.classList.remove("is-hot");
+    });
   });
 
 

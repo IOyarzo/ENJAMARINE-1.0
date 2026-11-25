@@ -23,6 +23,7 @@
     </a>
     <nav class="links" id="nav-links">
       <a href="#inicio">Inicio</a>
+      <a href="#nosotros">Nosotros</a>
       <a href="#servicios">Servicios</a>
       <a href="#trabajo">Personal</a>
       <a href="#contacto">Contacto</a>
@@ -52,16 +53,59 @@
     </div>
   </section>
 
-  <section class="about">
-    <div>
-      <p class="kicker dark">Quiénes somos</p>
-      <h2>Servicios operacionales para centros de salmón en mar.</h2>
+  <section id="nosotros" class="about">
+    <div class="about-bento">
+      <div class="about-story about-tile">
+        <span class="about-glow" aria-hidden="true"></span>
+        <p class="kicker dark">Quiénes somos</p>
+        <h2>Una empresa del sur, para la operación en mar.</h2>
+        <div class="about-copy">
+          <p>
+            Enjamarine es una empresa del sur de Chile, especializada en brindar
+            servicios de operarios de apoyo para empresas salmoneras.
+          </p>
+          <p>
+            Somos un equipo comprometido, responsable y con experiencia en faenas
+            en terreno. Entendemos la importancia de la puntualidad, la seguridad
+            y el buen desempeño en cada turno.
+          </p>
+          <p>
+            Nuestro compromiso es apoyar la operación de nuestros clientes con
+            personal confiable y capacitado, y al mismo tiempo generar
+            oportunidades de trabajo digno y estable para nuestros operarios.
+          </p>
+        </div>
+      </div>
+      <article class="about-card about-mission about-tile">
+        <span class="about-glow" aria-hidden="true"></span>
+        <p class="kicker dark">Misión</p>
+        <h3>Apoyo confiable en cada faena.</h3>
+        <p>
+          Brindar servicios de operarios de apoyo confiables, seguros y comprometidos
+          para empresas salmoneras, ejecutando cada labor en terreno con
+          responsabilidad, puntualidad y altos estándares de calidad, para
+          contribuir a la continuidad operativa de nuestros clientes y al
+          desarrollo de nuestros trabajadores.
+        </p>
+      </article>
+      <article class="about-card about-vision about-card-dark about-tile">
+        <span class="about-glow" aria-hidden="true"></span>
+        <span class="about-tide" aria-hidden="true"></span>
+        <p class="kicker light">Visión</p>
+        <h3>La referencia de apoyo en el sur.</h3>
+        <p>
+          Ser la empresa de apoyo operativo más confiable y reconocida de la
+          industria salmonera en el sur de Chile, destacando por la calidad de
+          nuestro equipo humano, la seguridad en cada faena y la construcción
+          de relaciones de largo plazo con nuestros clientes.
+        </p>
+      </article>
+      <blockquote class="about-quote about-tile">
+        <span class="about-glow" aria-hidden="true"></span>
+        <p>Si a nuestros clientes les va bien, a todos nos va bien.</p>
+        <i class="about-quote-line" aria-hidden="true"></i>
+      </blockquote>
     </div>
-    <p>
-      Inversiones Enjamarine SpA presta personal capacitado a empresas mandantes.
-      Conocemos la realidad del centro, el clima y los tiempos de la faena.
-      El objetivo es que el centro opere sin detenciones, cumpliendo sus protocolos.
-    </p>
   </section>
 
   <section class="stats">
@@ -209,6 +253,7 @@
       </div>
     </div>
     <form id="lead-form">
+      <div class="form-progress" aria-hidden="true"></div>
       <input name="nombre" required placeholder="Nombre" autocomplete="name" />
       <input name="empresa" required placeholder="Empresa o centro" />
       <input name="email" type="email" required placeholder="Correo" autocomplete="email" />
@@ -222,8 +267,15 @@
         <option>Personal permanente</option>
       </select>
       <textarea name="mensaje" rows="3" placeholder="Fechas, turnos y número de operarios"></textarea>
-      <button type="submit">Enviar</button>
-      <p id="form-note" hidden>Recibido. Te contactamos a la brevedad.</p>
+      <input class="hp" type="text" name="_honey" tabindex="-1" autocomplete="off" />
+      <button type="submit">
+        <span class="btn-label">Enviar</span>
+        <span class="btn-wait">
+          <i class="spinner" aria-hidden="true"></i>
+          Enviando cotización…
+        </span>
+      </button>
+      <p id="form-note" hidden role="status">Recibido. Te contactamos a la brevedad.</p>
     </form>
   </section>
 
@@ -237,6 +289,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="mail-config.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
